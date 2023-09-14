@@ -10,12 +10,12 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/NHAS/wag/internal/config"
-	"github.com/NHAS/wag/internal/data"
+	"github.com/NHAS/wag/internal/manager/config"
+	"github.com/NHAS/wag/internal/manager/data"
+	"github.com/NHAS/wag/internal/manager/ui"
+	"github.com/NHAS/wag/internal/manager/webserver"
 	"github.com/NHAS/wag/internal/router"
-	"github.com/NHAS/wag/internal/webserver"
 	"github.com/NHAS/wag/pkg/control/server"
-	"github.com/NHAS/wag/ui"
 	"golang.org/x/sys/unix"
 )
 

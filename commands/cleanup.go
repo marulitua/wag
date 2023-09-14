@@ -7,8 +7,8 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/NHAS/wag/internal/config"
-	"github.com/NHAS/wag/internal/router"
+	"github.com/NHAS/wag/internal/manager/config"
+	"github.com/NHAS/wag/internal/manager/router"
 	"github.com/NHAS/wag/pkg/control/server"
 )
 

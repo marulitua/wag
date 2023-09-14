@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/NHAS/wag/internal/config"
+	"github.com/NHAS/wag/internal/manager/config"
 	"golang.zx2c4.com/wireguard/wgctrl/wgtypes"
 )
 
