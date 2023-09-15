@@ -12,9 +12,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/NHAS/wag/internal/agent/routetypes"
 	"github.com/NHAS/wag/internal/config"
 	"github.com/NHAS/wag/internal/data"
-	"github.com/NHAS/wag/internal/routetypes"
 
 	"github.com/cilium/ebpf"
 	"golang.org/x/net/ipv4"

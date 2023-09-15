@@ -27,8 +27,11 @@ func setupWgTest() error {
 		return fmt.Errorf("cannot setup wireguard: %v", err)
 	}
 
-	err = setupXDP()
-	if err != nil {
+	if err := loadXDP(); err != nil {
+		return err
+	}
+
+	if err := attachXDP(); err != nil {
 		return err
 	}
 

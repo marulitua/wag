@@ -13,6 +13,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/NHAS/wag/internal/acls"
 	"github.com/NHAS/wag/internal/manager/webserver/authenticators"
 	"github.com/NHAS/wag/internal/routetypes"
 	"github.com/NHAS/wag/pkg/control"
@@ -42,16 +43,11 @@ func (wb webserverDetails) SupportsTLS() bool {
 	return len(wb.CertPath) > 0 && len(wb.KeyPath) > 0
 }
 
-type Acl struct {
-	Mfa   []string `json:",omitempty"`
-	Allow []string `json:",omitempty"`
-}
-
 type Acls struct {
 	Groups map[string][]string `json:",omitempty"`
 	//Username -> groups name
 	rGroupLookup map[string]map[string]bool
-	Policies     map[string]*Acl
+	Policies     map[string]*acls.Acl
 }
 
 func (a Acls) GetUserGroups(username string) (result []string) {
@@ -211,7 +207,7 @@ func SetLockout(lockout int) error {
 	return save()
 }
 
-func AddAcl(effects string, Rule Acl) error {
+func AddAcl(effects string, Rule acls.Acl) error {
 	valuesLock.Lock()
 	defer valuesLock.Unlock()
 
@@ -230,7 +226,7 @@ func AddAcl(effects string, Rule Acl) error {
 	return save()
 }
 
-func EditAcl(effects string, Rule Acl) error {
+func EditAcl(effects string, Rule acls.Acl) error {
 	valuesLock.Lock()
 	defer valuesLock.Unlock()
 
@@ -366,11 +362,11 @@ func Values() Config {
 	return v
 }
 
-func GetEffectiveAcl(username string) Acl {
+func GetEffectiveAcl(username string) acls.Acl {
 	valuesLock.RLock()
 	defer valuesLock.RUnlock()
 
-	var resultingACLs Acl
+	var resultingACLs acls.Acl
 	//Add the server address by default
 	resultingACLs.Allow = []string{values.Wireguard.ServerAddress.String() + "/32"}
 

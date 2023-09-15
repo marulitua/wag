@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/NHAS/wag/internal/config"
-	"github.com/NHAS/wag/internal/data"
 	"github.com/coreos/go-iptables/iptables"
 	"github.com/mdlayher/netlink"
 	"golang.org/x/sys/unix"
@@ -36,12 +35,18 @@ func Setup(error chan<- error, iptables bool) (err error) {
 		}
 	}()
 
-	err = setupXDP()
-	if err != nil {
+	if err := loadXDP(); err != nil {
+		return err
+	}
+
+	if err := attachXDP(); err != nil {
 		return err
 	}
 
 	go func() {
+
+		currentAddresses := make(map[string]string)
+
 		startup := true
 		for {
 
@@ -60,25 +65,12 @@ func Setup(error chan<- error, iptables bool) (err error) {
 
 				ip := p.AllowedIPs[0].IP.String()
 
-				d, err := data.GetDeviceByAddress(ip)
-				if err != nil {
-					log.Println("unable to get previous device endpoint for ", ip, err)
-					if err := Deauthenticate(ip); err != nil {
-						log.Println(ip, "unable to remove forwards for device: ", err)
-					}
-					continue
-				}
+				if currentAddresses[p.PublicKey.String()] != p.Endpoint.String() {
 
-				if d.Endpoint.String() != p.Endpoint.String() {
-
-					err = data.UpdateDeviceEndpoint(p.AllowedIPs[0].IP.String(), p.Endpoint)
-					if err != nil {
-						log.Println(ip, "unable to update device endpoint: ", err)
-					}
-
+					currentAddresses[p.PublicKey.String()] = p.Endpoint.String()
 					//Dont try and remove rules, if we've just started
 					if !startup {
-						log.Println(ip, "endpoint changed", d.Endpoint.String(), "->", p.Endpoint.String())
+						log.Println(ip, "endpoint changed", currentAddresses[p.PublicKey.String()], "->", p.Endpoint.String())
 						if err := Deauthenticate(ip); err != nil {
 							log.Println(ip, "unable to remove forwards for device: ", err)
 						}
